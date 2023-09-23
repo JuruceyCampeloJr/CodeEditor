@@ -14,7 +14,7 @@ import android.widget.MultiAutoCompleteTextView;
 public class CodeEditor extends  MultiAutoCompleteTextView {
 	
 	private int maxNumberOfSuggestions = Integer.MAX_VALUE;
-    private int autoCompleteItemHeightInDp = (int) (50 * Resources.getSystem().getDisplayMetrics().density);
+        private int autoCompleteItemHeightInDp = (int) (50 * Resources.getSystem().getDisplayMetrics().density);
 	
 	private Paint currentLineBackground;
 	private Rect currentLineBounds;
