@@ -19,9 +19,6 @@ public class CodeEditor extends  MultiAutoCompleteTextView {
 	private int maxNumberOfSuggestions = Integer.MAX_VALUE;
     private int autoCompleteItemHeightInDp = (int) (50 * Resources.getSystem().getDisplayMetrics().density);
 	
-	private SyntaxHighlighter syntaxHighlighter;
-	private EditTextFilter editTextFilter;
-	
 	private Paint currentLineBackground;
 	private Rect currentLineBounds;
 	private boolean enableCurrentLineBackground;
@@ -88,40 +85,9 @@ public class CodeEditor extends  MultiAutoCompleteTextView {
 		marginRightLineNumberText = 5.0f;
 		
 		enableLineNumber = true;
-		
-		syntaxHighlighter = new SyntaxHighlighter();
 	}
 	
-	public void syntaxHighlighter(Syntax syntax) {
-		syntaxHighlighter.syntax(syntax);
-		syntaxHighlighter.setEditText(this);
-		
-		addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-				
-			}
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-				
-			}
-			@Override
-			public void afterTextChanged(Editable editable) {
-				syntaxHighlighter.apply(editable);
-			}
-		});
-	}
-	public void indentation(int indentation) {
-		editTextFilter = new EditTextFilter(this, indentation);
-		
-		setFilters(new InputFilter[] {editTextFilter});
-		addTextChangedListener(editTextFilter);
-	}
-	public void autocomplete(Context context, String[] reservedWords) {
-        setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, reservedWords));
-		setThreshold(0);
-		setTokenizer(new SpaceTokenizer());
-	}
+	
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
