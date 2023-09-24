@@ -4,21 +4,27 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.Layout;
 import android.text.Selection;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.MultiAutoCompleteTextView;
 
 public class CodeEditor extends  MultiAutoCompleteTextView {
 	
 	private int maxNumberOfSuggestions = Integer.MAX_VALUE;
-        private int autoCompleteItemHeightInDp = (int) (50 * Resources.getSystem().getDisplayMetrics().density);
+    private int autoCompleteItemHeightInDp = (int) (50 * Resources.getSystem().getDisplayMetrics().density);
+	
+	private SyntaxHighlighter syntaxHighlighter;
+	private EditTextFilter editTextFilter;
 	
 	private Paint currentLineBackground;
 	private Rect currentLineBounds;
-	private boolean currentLineBackgroundEnabled;
+	private boolean enableCurrentLineBackground;
 	
 	private Paint lineNumberBackground;
 	private Paint lineDivider;
@@ -27,20 +33,23 @@ public class CodeEditor extends  MultiAutoCompleteTextView {
 	private float marginLeftLineNumberText;
 	private float marginRightLineNumberText;
 	
-	private boolean lineNumberEnabled;
+	private boolean enableLineNumber;
 	
 	public CodeEditor(Context context) {
 		super(context);
 		init();
 	}
+	
 	public CodeEditor(Context context, AttributeSet attributeSet) {
 		super(context, attributeSet);
 		init();
 	}
+	
 	public CodeEditor(Context context, AttributeSet attributeSet, int defStyleAttr) {
 		super(context, attributeSet, defStyleAttr);
 		init();
 	}
+	
 	public CodeEditor(Context context, AttributeSet attributeSet, int defStyleAttr, int defStyleRes) {
 		super(context, attributeSet, defStyleAttr, defStyleRes);
 		init();
@@ -58,7 +67,7 @@ public class CodeEditor extends  MultiAutoCompleteTextView {
 		
 		currentLineBackground = new Paint();
 		currentLineBounds = new Rect();
-		currentLineBackgroundEnabled = true;
+		enableCurrentLineBackground = true;
 		
 		currentLineBackground.setColor(0xFF353535);
 		
@@ -78,23 +87,60 @@ public class CodeEditor extends  MultiAutoCompleteTextView {
 		marginLeftLineNumberText = 15.0f;
 		marginRightLineNumberText = 5.0f;
 		
-		lineNumberEnabled = true;
+		enableLineNumber = true;
+		
+		syntaxHighlighter = new SyntaxHighlighter();
+	}
+	
+	public void syntaxHighlighter(Syntax syntax) {
+		syntaxHighlighter.syntax(syntax);
+		syntaxHighlighter.setEditText(this);
+		
+		addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+				
+			}
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+				
+			}
+			@Override
+			public void afterTextChanged(Editable editable) {
+				syntaxHighlighter.apply(editable);
+			}
+		});
+	}
+	public void indentation(int indentation) {
+		editTextFilter = new EditTextFilter(this, indentation);
+		
+		setFilters(new InputFilter[] {editTextFilter});
+		addTextChangedListener(editTextFilter);
+	}
+	public void autocomplete(Context context, String[] reservedWords) {
+        setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, reservedWords));
+		setThreshold(0);
+		setTokenizer(new SpaceTokenizer());
 	}
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
-		if(currentLineBackgroundEnabled) {
+		if(enableCurrentLineBackground) {
 			drawCurrentLineBackground(canvas);
 		}
 		super.onDraw(canvas);
 		
-		if(lineNumberEnabled) {
+		if(enableLineNumber) {
 			drawLineNumber(canvas);
 		}
 	}
 	
 	private void drawCurrentLineBackground(Canvas canvas) {
-		getLineBounds(getLayout().getLineForOffset(Selection.getSelectionStart(getText())), currentLineBounds);
+		Layout layout = getLayout();
+		
+		if(layout != null) {
+			getLineBounds(layout.getLineForOffset(Selection.getSelectionStart(getText())), currentLineBounds);
+		}
 		canvas.drawRect(currentLineBounds, currentLineBackground);
 	}
 	
@@ -107,11 +153,11 @@ public class CodeEditor extends  MultiAutoCompleteTextView {
 	}
 	
 	public boolean isCurrentLineBackgroundEnabled() {
-		return currentLineBackgroundEnabled;
+		return enableCurrentLineBackground;
 	}
 	
-	public void setisCurrentLineBackgroundEnabled(boolean enabled) {
-		currentLineBackgroundEnabled = enabled;
+	public void setEnableCurrentLineBackground(boolean enable) {
+		enableCurrentLineBackground = enable;
 	}
 	
 	private void drawLineNumber(Canvas canvas) {
@@ -119,14 +165,15 @@ public class CodeEditor extends  MultiAutoCompleteTextView {
 		
 		drawLineNumberBackground(canvas, width);
 		drawLineNumberText(canvas, width);
+		setPadding((int)width, 0, 0, 0);
 	}
 	
 	public boolean isLineNumberEnabled() {
-		return lineNumberEnabled;
+		return enableLineNumber;
 	}
 	
-	public void setLineNumberEnabled(boolean enabled) {
-		lineNumberEnabled = true;
+	public void setEnableLineNumber(boolean enable) {
+		enableLineNumber = enable;
 	}
 	
 	private void drawLineNumberBackground(Canvas canvas, float width) {
@@ -165,6 +212,14 @@ public class CodeEditor extends  MultiAutoCompleteTextView {
 			positionY += layout.getLineBaseline(i) - positionY;
 			canvas.drawText(String.valueOf(i + 1), getScrollX() + width - marginRightLineNumberText - 3, positionY, lineNumberText);
 		}
+	}
+	
+	public int getLineNumberTextColor() {
+		return lineNumberText.getColor();
+	}
+	
+	public void setLineNumberTextColor(int color) {
+		lineNumberText.setColor(color);
 	}
 	
 	public float getMarginLeftLineNumberText() {
@@ -217,4 +272,4 @@ public class CodeEditor extends  MultiAutoCompleteTextView {
 
         super.showDropDown();
     }
-}
+				      }
