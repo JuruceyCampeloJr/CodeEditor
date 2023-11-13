@@ -1,3 +1,5 @@
+package com.jurucey.codeblue.editor;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -33,9 +35,9 @@ public class CodeEditor extends AppCompatMultiAutoCompleteTextView {
 	private float marginLeftLineNumberText;
 	private float marginRightLineNumberText;
 	
-	private Paint currentLineTextBackground;
+	private Paint currentLineNumberTextBackground;
 	
-	private Paint currentLineText;
+	private Paint currentLineNumberText;
 	
 	private boolean enableLineNumber;
 	
@@ -92,16 +94,16 @@ public class CodeEditor extends AppCompatMultiAutoCompleteTextView {
 		marginLeftLineNumberText = 15.0f;
 		marginRightLineNumberText = 10.0f;
 		
-		currentLineTextBackground = new Paint();
+		currentLineNumberTextBackground = new Paint();
 		
-		currentLineTextBackground.setColor(0xFF505040);
+		currentLineNumberTextBackground.setColor(0xFF505040);
 		
-		currentLineText = new Paint();
+		currentLineNumberText = new Paint();
 		
-		currentLineText.setColor(0xFFFFFFFF);
-		currentLineText.setTypeface(getTypeface());
-		currentLineText.setTextSize(getTextSize());
-		currentLineText.setTextAlign(Paint.Align.RIGHT);
+		currentLineNumberText.setColor(0xFFFFFFFF);
+		currentLineNumberText.setTypeface(getTypeface());
+		currentLineNumberText.setTextSize(getTextSize());
+		currentLineNumberText.setTextAlign(Paint.Align.RIGHT);
 		
 		enableLineNumber = true;
 	}
@@ -230,30 +232,30 @@ public class CodeEditor extends AppCompatMultiAutoCompleteTextView {
 		
 		width += scrollX;
 		
-		canvas.drawRect(scrollX, layout.getLineTop(line), width - LINE_WIDTH_DIVIDER_LINE_NUMBER, layout.getLineBottom(line), currentLineTextBackground);
+		canvas.drawRect(scrollX, layout.getLineTop(line), width - LINE_WIDTH_DIVIDER_LINE_NUMBER, layout.getLineBottom(line), currentLineNumberTextBackground);
 	}
 	
 	public int getCurrentLineTextBackgroundColor() {
-		return currentLineTextBackground.getColor();
+		return currentLineNumberTextBackground.getColor();
 	}
 	
 	public void setCurrentLineTextBackgroundColor(int color) {
-		currentLineTextBackground.setColor(color);
+		currentLineNumberTextBackground.setColor(color);
 	}
 	
 	private void drawCurrentLineText(Canvas canvas, float width) {
 		Layout layout = getLayout();
 		int line = getCurrentLine();
 		
-		canvas.drawText(String.valueOf(line + 1), getScrollX() + width, layout.getLineBaseline(line), currentLineText);
+		canvas.drawText(String.valueOf(line + 1), getScrollX() + width, layout.getLineBaseline(line), currentLineNumberText);
 	}
 	
 	public int getCurrentLineTextColor() {
-		return currentLineText.getColor();
+		return currentLineNumberText.getColor();
 	}
 	
 	public void setCurrentLineTextColor(int color) {
-		currentLineText.setColor(color);
+		currentLineNumberText.setColor(color);
 	}
 	
 	private int getCurrentLine() {
@@ -299,4 +301,4 @@ public class CodeEditor extends AppCompatMultiAutoCompleteTextView {
 
         super.showDropDown();
     }
-		   }
+	}
